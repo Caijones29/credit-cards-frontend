@@ -25,11 +25,13 @@ function SessionPage() {
     const [estimate, setEstimate] = useState('');
     const [dataList, setDataList] = useState([]);
     const [privateSession, setPrivateSession] = useState(true);
+    const [users, setUsers] = useState([]);
     const stompClientRef = useRef(null);
     const { sessionCode } = useParams();
+    const [votedUsers, setVotedUsers] = useState({});
 
     sessionStorage.setItem('sessionCode',sessionCode );
-    // TODO Check whether username and userID are stored in session
+
     const handleRadioChange = (event) => {
         console.log("Radio button ", event.target.value, "  clicked!");
         setSelected(event.target.value);
@@ -63,6 +65,7 @@ function SessionPage() {
         setShowMedian(true);
         setFadeIn(true);
         setVotingEnabled(false);
+        sendMessage()
     };
 
     console.log("Selected value:", selected);
@@ -85,7 +88,7 @@ function SessionPage() {
     }, [estimate]);
 
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws');
+        const socket = new SockJS('https://credit-cards-f180ee269109.herokuapp.com/ws');
         const stompClient = new Client({
             webSocketFactory: () => socket,
             debug: function (str) {
@@ -97,7 +100,38 @@ function SessionPage() {
                     console.log('Received: ' + message.body);
                     try {
                         const receivedData = JSON.parse(message.body);
-                        setDataList(prevDataList => [...prevDataList, receivedData]);
+                        console.log(receivedData);
+
+                        if (receivedData.type === 'userJoined') {
+                            console.log("New user data:", receivedData.user);
+                            setUsers(prevUsers => {
+                                const userExists = prevUsers.some(user => user.userID === receivedData.user.userID);
+                                return userExists ? prevUsers : [...prevUsers, receivedData.user];});
+
+                            setVotedUsers(prevVotedUsers => ({...prevVotedUsers, [receivedData.user.userID]: false,}));
+                        } else if (receivedData.participants) {
+                            receivedData.participants.forEach(participant => {
+                                setUsers(prevUsers => {
+                                    const userExists = prevUsers.some(user => user.userID === participant.userID);
+                                    const updatedParticipant = receivedData.participants.find(p => p.userID === participant.userID);
+                                    if (updatedParticipant && updatedParticipant.estimate) {
+                                        participant.estimate = updatedParticipant.estimate;
+                                    }
+                                    return userExists ? prevUsers : [...prevUsers, participant];
+                                });
+                                setVotedUsers(prevVotedUsers => {
+                                    const updatedVotedUsers = { ...prevVotedUsers };
+                                    receivedData.participants.forEach(participant => {
+                                        if (participant.estimate) {
+                                            updatedVotedUsers[participant.userID] = true;
+                                        }
+                                    });
+                                    return updatedVotedUsers;
+                                });
+                            });
+                        } else {
+                            setDataList(prevDataList => [...prevDataList, receivedData]);
+                        }
                     } catch (error) {
                         console.error('Error parsing message body as JSON:', error);
                     }
@@ -119,7 +153,7 @@ function SessionPage() {
 
     const sendMessage = () => {
         const sessionRequest = {
-            revealVotes: revealVotes,
+            showEstimates: revealVotes,
             sessionCode: sessionCode,
             privateSession: privateSession,
             participant: {
@@ -152,6 +186,36 @@ function SessionPage() {
         }
     };
 
+    const dynamicPositions = (userCount) => {
+        const positions = [];
+        const radiusX = 52;
+        const radiusY = 60;
+        const centerX = 50;
+        const centerY = 54;
+        const startAngle = Math.PI / 1.5;
+        const minSpacing = 20;
+
+        const availableAngle = 360 - minSpacing;
+
+        for (let i = 0; i < userCount; i++) {
+            const angleDegrees = startAngle * (180 / Math.PI) + (i / userCount) * availableAngle;
+            const angleRadians = angleDegrees * (Math.PI / 180);
+            const top = centerY + radiusY * Math.sin(angleRadians);
+            const left = centerX + radiusX * Math.cos(angleRadians);
+            positions.push({
+                top: `${top}%`,
+                left: `${left}%`,
+                transform: 'translate(-50%, -50%)',
+            });
+        }
+        return positions;
+    };
+
+    const allUsersVoted = () => {
+        if (users.length === 0) return false;
+        return users.every(user => votedUsers[user.userID] === true);
+    };
+
     return (
         <>
             <header className="Header">
@@ -179,7 +243,7 @@ function SessionPage() {
                         </button>
                     )}
                     <div className="Poker-table">
-                        {!showMode && selected && !revealVotes && (
+                        {allUsersVoted() && !showMode && selected && !revealVotes && (
                             <button className="Reveal-submitted-votes-button" onClick={handleRevealVotes}>Reveal Submitted Votes</button>
                         )}
 
@@ -221,22 +285,50 @@ function SessionPage() {
                                     {selected}
                                 </div>
                                 <div className="Submitted-vote-card-text">
-                                    {username}'s Vote
+                                    Your Vote
                                 </div>
                             </div>
                         )}
+
+                        {users.filter(user => user.userID !== sessionStorage.getItem('userID'))
+                            .map((user, index) => {
+                                const positions = dynamicPositions(users.length - 1);
+                                if (!positions || positions.length === 0 || index >= positions.length) {
+                                    return null; // Or return <></>;
+                                }
+                                const position = positions[index % positions.length];
+                                return (
+                                    <div
+                                        key={user.userID}
+                                        className="Submitted-vote-card-container"
+                                        style={{
+                                            top: position.top,
+                                            left: position.left,
+                                            transform: position.transform,
+                                        }}
+                                    >
+                                        <div className="Submitted-vote-card">
+                                            {revealVotes ? (user.estimate ? user.estimate : "?") : "?"}
+                                        </div>
+                                        <div className="Submitted-vote-card-text">
+                                            {user.userName}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+
                     </div>
                 </div>
 
-                    <div className="Voting-button-container">
-                        {["1", "2", "3", "5", "8", "13", "?"].map((value) => (
-                            <label key={value} className={`Voting-button ${selected === value ? "checked" : ""}`} style={{ pointerEvents: votingEnabled ? 'auto' : 'none', opacity: votingEnabled ? 1 : 0.6 }} >
-                                {value}
-                                    <input type="radio" name="radio" value={value} checked={selected === value} onChange={handleRadioChange} disabled={!votingEnabled}/>
-                            </label>
-                        ))}
-                    </div>
+                <div className="Voting-button-container">
+                    {["1", "2", "3", "5", "8", "13", "?"].map((value) => (
+                        <label key={value} className={`Voting-button ${selected === value ? "checked" : ""}`} style={{ pointerEvents: votingEnabled ? 'auto' : 'none', opacity: votingEnabled ? 1 : 0.6 }} >
+                            {value}
+                            <input type="radio" name="radio" value={value} checked={selected === value} onChange={handleRadioChange} disabled={!votingEnabled}/>
+                        </label>
+                    ))}
                 </div>
+            </div>
         </>
     );
 }

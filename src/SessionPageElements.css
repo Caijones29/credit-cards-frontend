@@ -1,6 +1,6 @@
 .Welcome-popup {
     position: fixed;
-    top: 42.5%;
+    top: 40%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -104,7 +104,7 @@
     width: 100px;
     height: auto;
     position: absolute;
-    top: 100%;
+    top: 115%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;
@@ -128,7 +128,7 @@
     align-items: center;
     transform: none;
     z-index: 1;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 }
 
 .Submitted-vote-card-text {
