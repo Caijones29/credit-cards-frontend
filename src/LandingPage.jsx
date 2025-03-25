@@ -49,7 +49,7 @@ function LandingPage() {
 
     const createSession = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/session/createNewSession');
+            const response = await axios.post('https://credit-cards-f180ee269109.herokuapp.com/session/createNewSession');
             const sessionCode = response.data.sessionCode; // Extract sessionCode from the response
 
             if (sessionCode != null) {
