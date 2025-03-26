@@ -1,0 +1,161 @@
+.AvatarCustomiserPopUp-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.AvatarCustomiserPopUp-content {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 40px;
+    border-radius: 40px;
+    width: 400px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    font-family: "Ford Antenna", sans-serif;
+    color: midnightblue;
+    transition: all 0.3s ease-in-out;
+}
+
+.Save-avatar-button{
+    margin-top: 30px;
+    padding: 16px 30px;
+    background-color: #365da7;
+    color: white;
+    border: none;
+    border-radius: 36px;
+    font-size: 18px;
+    cursor: pointer;
+    font-family: "Ford Antenna", sans-serif;
+    transition-duration: 0.3s;
+}
+
+.Save-avatar-button:hover{
+    background-color: white;
+    color: midnightblue;
+    border: 3px solid #365da7;
+    font-weight: bold;
+}
+
+.Avatar-preview-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+}
+
+.Avatar-preview-image {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    z-index: 1;
+}
+
+.Avatar-clothing-image {
+    position: absolute;
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    z-index: 1;
+}
+
+.Avatar-eye-image,
+.Avatar-mouth-image {
+    position: absolute;
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    z-index: 2;
+}
+
+.Avatar-hat-image {
+    position: absolute;
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    z-index: 3;
+}
+
+.Avatar-extras-image {
+    position: absolute;
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    z-index: 4;
+}
+
+.Popup-title {
+    font-family: "Ford Antenna", sans-serif;
+    color: midnightblue;
+    margin-bottom: 20px;
+}
+
+.Avatar-button-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.Avatar-cycle-button {
+    background-color: #365da7;
+    color: white;
+    border: 2px solid transparent;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-family: "Ford Antenna", sans-serif;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.Avatar-cycle-button:hover {
+    background-color: white;
+    color: midnightblue;
+    border-color: #365da7;
+    font-weight: bold;
+}
+
+.Customisation-label {
+    font-family: "Ford Antenna", sans-serif;
+    font-size: 24px;
+    color: #365da7;
+    margin: 0 15px;
+    margin-top: 10px;
+}
+
+.Avatar-options-container {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.Avatar-option {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 12px;
+    padding: 10px;
+    transition: background-color 0.2s;
+}
+
+.Avatar-option:hover {
+    background-color: #f0f0f0;
+}
+
+.Avatar-option img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
