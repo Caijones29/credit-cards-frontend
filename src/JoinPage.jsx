@@ -49,7 +49,6 @@ function JoinPage() {
 
     return (
         <>
-            {/* Header */}
             <header className="Header">
                 <img src={logo} className="Logo-spin-flat"/>
                 <div className="Header-wrapper">
@@ -59,11 +58,10 @@ function JoinPage() {
                 </div>
             </header>
 
-            {/* App Body */}
             {isLoading ? (
                 <LoadingPage />
             ) : (
-            /*App Body*/
+
             <div className="App-body">
                 <form className="form-container" onSubmit={redirectToSession}>
                     <h1>Hello {username}!</h1>
@@ -72,7 +70,7 @@ function JoinPage() {
                         <b>Please enter the Session Code</b>
                     </label>
 
-                    <input type="text" placeholder="e.g. 1234" name="sessionCode" value={sessionCode} onChange={handleSessionCodeChange} required/>
+                    <input type="text" placeholder="e.g. v0t1N" name="sessionCode" value={sessionCode} onChange={handleSessionCodeChange} required/>
 
                     <button type="submit" className="Join-session-button" disabled={!sessionCode}>
                         Join Session

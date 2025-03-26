@@ -21,10 +21,13 @@
   min-height: 10vh;
   font-size: calc(50px + 2vmin);
   font-weight: bold;
-  font-family: "Ford Antenna";
+  font-family: "Ford Antenna", sans-serif;
   color: midnightblue;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
   padding-right: 10%;
 }
 

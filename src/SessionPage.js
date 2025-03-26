@@ -1,17 +1,17 @@
+import React, { useEffect, useRef, useState } from 'react';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
+import { Link, useParams } from 'react-router-dom';
 import logo from './logo.png';
 import './App.css';
 import './LogoElements.css';
 import './LandingPageElements.css';
 import './SessionPageElements.css';
 import './LandingPage.jsx';
-import { Link, useParams } from 'react-router-dom';
-import React, { useEffect, useRef, useState } from 'react';
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
 
 function SessionPage() {
     const [selected, setSelected] = useState(null);
-    const [revealVotes, setRevealVotes] = useState(false);
+    const [showEstimates, setShowEstimates] = useState(false);
     const [username, setUsername] = useState('');
     const [showWelcome, setShowWelcome] = useState(true);
     const [modeValue, setModeValue] = useState('');
@@ -20,22 +20,21 @@ function SessionPage() {
     const [showMean, setShowMean] = useState(false);
     const [medianValue, setMedianValue] = useState('');
     const [showMedian, setShowMedian] = useState(false);
+    const [resetEstimates, setResetEstimates] = useState(false);
     const [fadeIn, setFadeIn] = useState(false);
-    const [votingEnabled, setVotingEnabled] = useState(true);
-    const [estimate, setEstimate] = useState('');
-    const [dataList, setDataList] = useState([]);
+    const [estimate, setEstimate] = useState("");
     const [privateSession, setPrivateSession] = useState(true);
     const [users, setUsers] = useState([]);
     const stompClientRef = useRef(null);
     const { sessionCode } = useParams();
+    const [copyNotification, setCopyNotification] = useState('');
     const [votedUsers, setVotedUsers] = useState({});
 
-    sessionStorage.setItem('sessionCode',sessionCode );
+    sessionStorage.setItem('sessionCode', sessionCode);
 
     const handleRadioChange = (event) => {
         console.log("Radio button ", event.target.value, "  clicked!");
         setSelected(event.target.value);
-        setRevealVotes(false);
         setShowMode(false);
         setShowMean(false);
         setShowMedian(false);
@@ -47,28 +46,58 @@ function SessionPage() {
 
     const handleResetVoting = () => {
         setSelected(null);
-        setRevealVotes(false);
+        setShowEstimates(false);
+        setResetEstimates(true);
         setShowMode(false);
         setShowMean(false);
         setShowMedian(false);
         setModeValue('');
         setMeanValue('');
         setMedianValue('');
-        setVotingEnabled(true);
         setFadeIn(false);
     };
 
+    const handleResetVotingFromOthers = () => {
+        setSelected(null);
+        setShowEstimates(false);
+        setResetEstimates(false);
+        setShowMode(false);
+        setShowMean(false);
+        setShowMedian(false);
+        setModeValue('');
+        setMeanValue('');
+        setMedianValue('');
+        setFadeIn(false);
+        setEstimate('');
+        setVotedUsers({});
+        console.log('Session has been reset by another user');
+    };
+
+    useEffect(() => {
+        if (resetEstimates) {
+            handleResetVotingFromOthers();
+            setResetEstimates(false);
+        }
+    }, [resetEstimates]);
+
+
     const handleRevealVotes = () => {
-        setRevealVotes(true);
+        setShowEstimates(true);
         setShowMode(true);
         setShowMean(true);
         setShowMedian(true);
         setFadeIn(true);
-        setVotingEnabled(false);
-        sendMessage()
     };
 
-    console.log("Selected value:", selected);
+    useEffect(() => {
+        if (showEstimates) {
+            sendMessage();
+        }
+    }, [showEstimates]);
+
+    useEffect(() => {
+            sendMessage();
+    }, [resetEstimates]);
 
     useEffect(() => {
         const storedUsername = sessionStorage.getItem('username');
@@ -102,40 +131,33 @@ function SessionPage() {
                         const receivedData = JSON.parse(message.body);
                         console.log(receivedData);
 
-                        if (receivedData.type === 'userJoined') {
-                            console.log("New user data:", receivedData.user);
-                            setUsers(prevUsers => {
-                                const userExists = prevUsers.some(user => user.userID === receivedData.user.userID);
-                                return userExists ? prevUsers : [...prevUsers, receivedData.user];});
+                        if (receivedData.participants) {
+                            console.log("Participants data:", receivedData.participants);
 
-                            setVotedUsers(prevVotedUsers => ({...prevVotedUsers, [receivedData.user.userID]: false,}));
-                        } else if (receivedData.participants) {
+                            setUsers(receivedData.participants);
+
+                            const updatedVotedUsers = {};
                             receivedData.participants.forEach(participant => {
-                                setUsers(prevUsers => {
-                                    const userExists = prevUsers.some(user => user.userID === participant.userID);
-                                    const updatedParticipant = receivedData.participants.find(p => p.userID === participant.userID);
-                                    if (updatedParticipant && updatedParticipant.estimate) {
-                                        participant.estimate = updatedParticipant.estimate;
-                                    }
-                                    return userExists ? prevUsers : [...prevUsers, participant];
-                                });
-                                setVotedUsers(prevVotedUsers => {
-                                    const updatedVotedUsers = { ...prevVotedUsers };
-                                    receivedData.participants.forEach(participant => {
-                                        if (participant.estimate) {
-                                            updatedVotedUsers[participant.userID] = true;
-                                        }
-                                    });
-                                    return updatedVotedUsers;
-                                });
+                                if (participant.estimate) {
+                                    updatedVotedUsers[participant.userID] = true;
+                                }
                             });
-                        } else {
-                            setDataList(prevDataList => [...prevDataList, receivedData]);
+                            setVotedUsers(updatedVotedUsers);
                         }
+
+                        if(receivedData.showEstimates === true) {
+                            setShowEstimates(receivedData.showEstimates);
+                            handleRevealVotes()
+                        }
+                        if (receivedData.resetEstimates === true) {
+                            handleResetVotingFromOthers();
+                        }
+
                     } catch (error) {
                         console.error('Error parsing message body as JSON:', error);
                     }
                 });
+                sendMessage()
             },
         });
 
@@ -153,7 +175,8 @@ function SessionPage() {
 
     const sendMessage = () => {
         const sessionRequest = {
-            showEstimates: revealVotes,
+            showEstimates: showEstimates,
+            resetEstimates: resetEstimates,
             sessionCode: sessionCode,
             privateSession: privateSession,
             participant: {
@@ -165,7 +188,7 @@ function SessionPage() {
 
         if (stompClientRef.current && stompClientRef.current.connected) {
             stompClientRef.current.publish({
-                destination: '/app/session/info/pQvxO',
+                destination: '/app/session/info/{sessionCode}',
                 body: JSON.stringify(sessionRequest),
                 headers: {
                     'sessionCode': sessionRequest.sessionCode,
@@ -183,6 +206,22 @@ function SessionPage() {
             stompClientRef.current.deactivate(() => {
                 console.log('Disconnected from WebSocket server');
             });
+        }
+    };
+
+    const handleCopySessionCode = async () => {
+        try {
+            await navigator.clipboard.writeText(sessionCode);
+            setCopyNotification('Session code copied to clipboard!');
+            setTimeout(() => {
+                setCopyNotification('');
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+            setCopyNotification('Failed to copy session code. Please try again.');
+            setTimeout(() => {
+                setCopyNotification('');
+            }, 2000);
         }
     };
 
@@ -211,11 +250,6 @@ function SessionPage() {
         return positions;
     };
 
-    const allUsersVoted = () => {
-        if (users.length === 0) return false;
-        return users.every(user => votedUsers[user.userID] === true);
-    };
-
     return (
         <>
             <header className="Header">
@@ -227,6 +261,10 @@ function SessionPage() {
                         </h1>
                     </Link>
                 </div>
+                <div className="Session-code-display">
+                    <span className="Session-code-label">Session Code:</span>
+                    <span className="Session-code-value" onClick={handleCopySessionCode} title="Click to Copy">{sessionCode}</span>
+                </div>
             </header>
 
             {showWelcome && (
@@ -236,17 +274,19 @@ function SessionPage() {
             )}
 
             <div className="App-body">
+                {copyNotification && (
+                    <div className="Copy-notification">
+                        {copyNotification}
+                    </div>
+                )}
                 <div className="Poker-table-container">
-                    {selected && (
                         <button className="Reset-voting-button" onClick={handleResetVoting}>
                             Reset Voting
                         </button>
-                    )}
                     <div className="Poker-table">
-                        {allUsersVoted() && !showMode && selected && !revealVotes && (
-                            <button className="Reveal-submitted-votes-button" onClick={handleRevealVotes}>Reveal Submitted Votes</button>
+                        {!showEstimates && (
+                            <button className="Reveal-submitted-votes-button" onClick={handleRevealVotes}>Reveal Votes</button>
                         )}
-
                         <div className={`Vote-average-container ${fadeIn ? 'fade-in' : ''}`}>
                             <div className="Mean-vote-average-container" style={{ display: showMean ? 'flex' : 'none' }}>
                                 <div className="Mean-vote-average">
@@ -294,21 +334,17 @@ function SessionPage() {
                             .map((user, index) => {
                                 const positions = dynamicPositions(users.length - 1);
                                 if (!positions || positions.length === 0 || index >= positions.length) {
-                                    return null; // Or return <></>;
+                                    return null;
                                 }
                                 const position = positions[index % positions.length];
                                 return (
-                                    <div
-                                        key={user.userID}
-                                        className="Submitted-vote-card-container"
-                                        style={{
+                                    <div key={user.userID} className="Submitted-vote-card-container" style={{
                                             top: position.top,
                                             left: position.left,
                                             transform: position.transform,
-                                        }}
-                                    >
+                                        }}>
                                         <div className="Submitted-vote-card">
-                                            {revealVotes ? (user.estimate ? user.estimate : "?") : "?"}
+                                            {showEstimates ? (user.estimate ? user.estimate : "?") : "?"}
                                         </div>
                                         <div className="Submitted-vote-card-text">
                                             {user.userName}
@@ -322,9 +358,9 @@ function SessionPage() {
 
                 <div className="Voting-button-container">
                     {["1", "2", "3", "5", "8", "13", "?"].map((value) => (
-                        <label key={value} className={`Voting-button ${selected === value ? "checked" : ""}`} style={{ pointerEvents: votingEnabled ? 'auto' : 'none', opacity: votingEnabled ? 1 : 0.6 }} >
+                        <label key={value} className={`Voting-button ${selected === value ? "checked" : ""}`} >
                             {value}
-                            <input type="radio" name="radio" value={value} checked={selected === value} onChange={handleRadioChange} disabled={!votingEnabled}/>
+                            <input type="radio" name="radio" value={value} checked={selected === value} onChange={handleRadioChange}/>
                         </label>
                     ))}
                 </div>
