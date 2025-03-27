@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import logo from './logo.png';
 import emptyBaseAvatar from './avatarCreationImages/Bases/emptyBaseAvatar.png';
 import './App.css';
@@ -8,12 +10,12 @@ import './SessionPageElements.css';
 import './SessionPage';
 import './LoadingPage';
 import LoadingPage from './LoadingPage';
-import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import AvatarCustomiserPopUp from './AvatarCustomiserPopUp.jsx';
 import AvatarPreview from "./AvatarPreview";
 
 function LandingPage() {
+
     const navigate = useNavigate();
     const [username, setUserName] = useState("");
     const [popupMessage, setPopupMessage] = useState("Welcome!");
@@ -45,13 +47,28 @@ function LandingPage() {
     function redirectToSession() {
         setIsLoading(true);
         setTimeout(() => {
-            navigate("/poker-table");
+            navigate(`/session/${sessionStorage.getItem('sessionCode')}`);
             setIsLoading(false);
         }, 3000);
     }
 
+    const createSession = async () => {
+        try {
+            const response = await axios.post('https://credit-cards-f180ee269109.herokuapp.com/session/createNewSession');
+            const sessionCode = response.data.sessionCode;
+
+            if (sessionCode != null) {
+                sessionStorage.setItem("sessionCode", sessionCode);
+                redirectToSession();
+            }
+
+        } catch (err) {
+            console.log("Error Creating Session")
+        }
+    }
+
     function redirectToJoin() {
-        navigate("/join-existing");
+        navigate("/join-existing")
     }
 
     const handleNameChange = (event) => {
@@ -66,6 +83,7 @@ function LandingPage() {
         setShowInput(false);
 
         const myuuid = saveUUID();
+
         sessionStorage.setItem("username", username);
         sessionStorage.setItem("userID", myuuid);
 
@@ -93,15 +111,20 @@ function LandingPage() {
 
     return (
         <>
-            {/* Header */}
             <header className="Header">
                 <img src={logo} className="Logo-spin-flat" alt="Logo" />
                 <div className="Header-wrapper">
-                    <h1 className="Header-text">Credit Cards</h1>
+                    <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <h1 className="Header-text">
+                            Credit Cards
+                        </h1>
+                    </Link>
+                    <span className="Header-subtext">
+                        Planning Poker
+                    </span>
                 </div>
             </header>
 
-            {/* Login Popup */}
             {!avatarCustomiserVisible && (
                 <div className={`Login-popup ${FadePopup ? 'FadePopup' : ''}`} id="loginForm" ref={popupRef}>
                     <form className="form-container">
@@ -113,7 +136,7 @@ function LandingPage() {
                                 className="Avatar-container"
                                 onMouseEnter={() => setIsHovered(true)}
                                 onMouseLeave={() => setIsHovered(false)}
-                                onClick={handleAvatarClick} // Add onClick handler
+                                onClick={handleAvatarClick}
                             >
                                 <div>
                                     {avatarObject ? (
@@ -123,17 +146,18 @@ function LandingPage() {
                                             src={emptyBaseAvatar}
                                             alt="Avatar"
                                             className="Avatar-image"
-                                        />                                    )}
+                                        />
+                                    )}
                                 </div>
                                 {isHovered && <div className="Avatar-tooltip">Edit Avatar</div>}
                             </div>
                         )}
-
                         {showInput && (
                             <>
-                                <label htmlFor="username">
+                                <label form="username">
                                     <b>Please enter your username</b>
                                 </label>
+
                                 <input
                                     type="text"
                                     placeholder="e.g. Pokerface100 B-)"
@@ -142,6 +166,7 @@ function LandingPage() {
                                     onChange={handleNameChange}
                                     required
                                 />
+
                                 <button
                                     type="submit"
                                     className="Submit-username-button"
@@ -150,6 +175,7 @@ function LandingPage() {
                                 >
                                     Submit Username
                                 </button>
+
                                 <button
                                     type="button"
                                     className="Close-popup-button"
@@ -163,7 +189,6 @@ function LandingPage() {
                 </div>
             )}
 
-            {/* Avatar Customiser Pop-up */}
             {avatarCustomiserVisible && (
                 <AvatarCustomiserPopUp closePopup={handleBackToLogin} />
             )}
@@ -176,10 +201,12 @@ function LandingPage() {
                         <div className="Landing-buttons-container">
                             <button
                                 className="Landing-button-component"
-                                onClick={redirectToSession}
+                                onClick={createSession}
                                 disabled={!submitted}
                             >
-                                <p>Create Session</p>
+                                <p>
+                                    Create Session
+                                </p>
                             </button>
 
                             <div className="Button-divider"></div>
@@ -189,7 +216,9 @@ function LandingPage() {
                                 onClick={redirectToJoin}
                                 disabled={!submitted}
                             >
-                                <p>Join Session</p>
+                                <p>
+                                    Join Session
+                                </p>
                             </button>
                         </div>
                     </div>
@@ -199,13 +228,15 @@ function LandingPage() {
                             className="Text-button-component"
                             onClick={openPopup}
                         >
-                            <p>{submitted ? "Edit Username and Avatar" : "Add Username and Customise Avatar"}</p>
+                            <p>
+                                {submitted ? "Edit Username and Avatar" : "Add Username and Avatar"}
+                            </p>
                         </button>
                     </div>
                 </div>
             )}
         </>
-    );
+    )
 }
 
 export default LandingPage;

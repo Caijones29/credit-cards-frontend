@@ -29,6 +29,7 @@ function SessionPage() {
     const { sessionCode } = useParams();
     const [copyNotification, setCopyNotification] = useState('');
     const [votedUsers, setVotedUsers] = useState({});
+    const [displayVote, setDisplayVote] = useState("?");
 
     sessionStorage.setItem('sessionCode', sessionCode);
 
@@ -42,6 +43,7 @@ function SessionPage() {
         setMeanValue(event.target.value);
         setMedianValue(event.target.value);
         setEstimate(event.target.value);
+        setDisplayVote(event.target.value);
     };
 
     const handleResetVoting = () => {
@@ -55,6 +57,7 @@ function SessionPage() {
         setMeanValue('');
         setMedianValue('');
         setFadeIn(false);
+        setDisplayVote("?");
     };
 
     const handleResetVotingFromOthers = () => {
@@ -70,6 +73,7 @@ function SessionPage() {
         setFadeIn(false);
         setEstimate('');
         setVotedUsers({});
+        setDisplayVote("?");
         console.log('Session has been reset by another user');
     };
 
@@ -260,7 +264,11 @@ function SessionPage() {
                             Credit Cards
                         </h1>
                     </Link>
+                    <span className="Header-subtext">
+                        Planning Poker
+                    </span>
                 </div>
+
                 <div className="Session-code-display">
                     <span className="Session-code-label">Session Code:</span>
                     <span className="Session-code-value" onClick={handleCopySessionCode} title="Click to Copy">{sessionCode}</span>
@@ -319,16 +327,14 @@ function SessionPage() {
                             </div>
                         </div>
 
-                        {selected && (
                             <div className="Submitted-vote-card-container">
                                 <div className="Submitted-vote-card">
-                                    {selected}
+                                    {displayVote}
                                 </div>
                                 <div className="Submitted-vote-card-text">
                                     Your Vote
                                 </div>
                             </div>
-                        )}
 
                         {users.filter(user => user.userID !== sessionStorage.getItem('userID'))
                             .map((user, index) => {

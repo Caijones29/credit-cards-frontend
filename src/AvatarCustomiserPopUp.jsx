@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './AvatarCustomiserPopUp.css';
+import './AvatarPreview.css';
 import AvatarPreview from './AvatarPreview'; // Import the AvatarPreview component
 import {
     baseOptions,
@@ -118,7 +119,8 @@ const AvatarCustomiserPopUp = ({ closePopup }) => {
 
                         closePopup();
                     }}
-                >Save Avatar
+                >
+                    Save Avatar
                 </button>
 
             </div>

@@ -34,6 +34,7 @@
 .Header-wrapper {
   flex-grow: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
@@ -41,5 +42,14 @@
 .Header-text {
   margin: 0;
   font-size: 65px;
+  text-align: center;
 }
 
+.Header-subtext {
+  font-size: 20px;
+  color: #365da7;
+  display: block;
+  margin-top: 5px;
+  font-weight: lighter;
+  text-align: center;
+}

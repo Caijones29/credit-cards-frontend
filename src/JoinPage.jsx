@@ -7,8 +7,8 @@ import './JoinPageElements.css'
 import './SessionPage'
 import './LoadingPage';
 import LoadingPage from "./LoadingPage";
-import {useNavigate} from 'react-router-dom';
-import {useState} from "react";
+import {Link, useNavigate} from 'react-router-dom';
+import React, {useState} from "react";
 import {useEffect} from "react";
 
 
@@ -50,11 +50,16 @@ function JoinPage() {
     return (
         <>
             <header className="Header">
-                <img src={logo} className="Logo-spin-flat"/>
+                <img src={logo} className="Logo-spin-flat" alt="Logo" />
                 <div className="Header-wrapper">
-                    <h1 className="Header-text">
-                        Credit Cards
-                    </h1>
+                    <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <h1 className="Header-text">
+                            Credit Cards
+                        </h1>
+                    </Link>
+                    <span className="Header-subtext">
+                        Planning Poker
+                    </span>
                 </div>
             </header>
 
