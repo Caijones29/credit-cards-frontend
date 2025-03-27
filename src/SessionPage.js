@@ -38,9 +38,9 @@ function SessionPage() {
         setShowMode(false);
         setShowMean(false);
         setShowMedian(false);
-        setModeValue(event.target.value);
-        setMeanValue(event.target.value);
-        setMedianValue(event.target.value);
+        // setModeValue(event.target.value);
+        // setMeanValue(event.target.value);
+        // setMedianValue(event.target.value);
         setEstimate(event.target.value);
     };
 
@@ -51,9 +51,9 @@ function SessionPage() {
         setShowMode(false);
         setShowMean(false);
         setShowMedian(false);
-        setModeValue('');
-        setMeanValue('');
-        setMedianValue('');
+        // setModeValue('');
+        // setMeanValue('');
+        // setMedianValue('');
         setFadeIn(false);
     };
 
@@ -64,9 +64,9 @@ function SessionPage() {
         setShowMode(false);
         setShowMean(false);
         setShowMedian(false);
-        setModeValue('');
-        setMeanValue('');
-        setMedianValue('');
+        // setModeValue('');
+        // setMeanValue('');
+        // setMedianValue('');
         setFadeIn(false);
         setEstimate('');
         setVotedUsers({});
@@ -152,6 +152,12 @@ function SessionPage() {
                         if (receivedData.resetEstimates === true) {
                             handleResetVotingFromOthers();
                         }
+
+                        console.log(receivedData.sessionAverages)
+                        setMeanValue(receivedData.sessionAverages.mean);
+                        setModeValue(receivedData.sessionAverages.mode);
+                        setMedianValue(receivedData.sessionAverages.median);
+
 
                     } catch (error) {
                         console.error('Error parsing message body as JSON:', error);
