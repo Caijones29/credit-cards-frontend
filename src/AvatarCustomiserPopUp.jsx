@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './AvatarCustomiserPopUp.css';
 import './AvatarPreview.css';
-import AvatarPreview from './AvatarPreview'; // Import the AvatarPreview component
+import AvatarPreview from './AvatarPreview';
+import RandomiseAvatar from './RandomiseAvatar';
+
 import {
     baseOptions,
     eyeOptions,
@@ -54,8 +56,7 @@ const AvatarCustomiserPopUp = ({ closePopup }) => {
             mouth: mouthIndex >= 0 ? mouthOptions[mouthIndex] : avatarObject.mouth,
             hat: hatIndex >= 0 ? hatOptions[hatIndex] : avatarObject.hat,
             clothing: clothingIndex >= 0 ? clothingOptions[clothingIndex] : avatarObject.clothing,
-            extras: extrasIndex >= 0 ? extrasOptions[extrasIndex] : avatarObject.extras,
-            unlockables: avatarObject.unlockables // assuming these remain unchanged
+            extras: extrasIndex >= 0 ? extrasOptions[extrasIndex] : avatarObject.extras
         });
         console.log('Updated avatarObject:', avatarObject);
     };
@@ -72,6 +73,18 @@ const AvatarCustomiserPopUp = ({ closePopup }) => {
 
                 {/* Use the AvatarPreview component to render the avatar */}
                 <AvatarPreview avatarObject={avatarObject} />
+
+                <div className="Randomise-button-wrapper">
+                    <RandomiseAvatar
+                        setBaseIndex={setBaseIndex}
+                        setEyeIndex={setEyeIndex}
+                        setMouthIndex={setMouthIndex}
+                        setHatIndex={setHatIndex}
+                        setClothingIndex={setClothingIndex}
+                        setExtrasIndex={setExtrasIndex}
+                    />
+                </div>
+
 
                 <div className="Avatar-button-row">
                     <button className="Avatar-cycle-button" onClick={prevBase}>⟵</button>

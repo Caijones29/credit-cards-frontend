@@ -24,7 +24,8 @@
     transition: all 0.3s ease-in-out;
 }
 
-.Save-avatar-button{
+.Save-avatar-button,
+.Randomise-avatar-button{
     margin-top: 30px;
     padding: 16px 30px;
     background-color: #365da7;
@@ -35,6 +36,10 @@
     cursor: pointer;
     font-family: "Ford Antenna", sans-serif;
     transition-duration: 0.3s;
+}
+
+.Randomise-button-wrapper{
+    margin-bottom: 10px;
 }
 
 .Save-avatar-button:hover{
@@ -49,7 +54,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 30px 0;
 }
 
 .Avatar-preview-image {

@@ -75,11 +75,10 @@ export const extrasOptions = [
 
 // the initial avatar object. When the user starts editing their avatar, the default empty one is displayed.
 export const defaultAvatarObject = {
-    base: null,
+    base: emptyBaseAvatar,
     eyes: null,
     mouth: null,
     hat: null,
     clothing: null,
-    extras: null,
-    unlockables: []
+    extras: null
 };
