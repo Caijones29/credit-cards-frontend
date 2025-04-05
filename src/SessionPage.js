@@ -58,6 +58,12 @@ function SessionPage() {
     }, []);
 
     useEffect(() => {
+        if (estimate) {
+            sendMessage();
+        }
+    }, [estimate]);
+
+    useEffect(() => {
         const socket = new SockJS('https://credit-cards-f180ee269109.herokuapp.com/ws');
         const stompClient = new Client({
             webSocketFactory: () => socket,
@@ -93,6 +99,12 @@ function SessionPage() {
                         if (receivedData.resetEstimates === true) {
                             handleResetVotingFromOthers();
                         }
+
+                        console.log(receivedData.sessionAverages)
+                        setMeanValue(receivedData.sessionAverages.mean);
+                        setModeValue(receivedData.sessionAverages.mode);
+                        setMedianValue(receivedData.sessionAverages.median);
+
 
                     } catch (error) {
                         console.error('Error parsing message body as JSON:', error);
