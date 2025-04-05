@@ -1,56 +1,27 @@
-import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import logo from './logo.png';
-import emptyBaseAvatar from './avatarCreationImages/Bases/emptyBaseAvatar.png';
 import './App.css';
 import './LogoElements.css';
 import './LandingPageElements.css';
 import './SessionPageElements.css';
-import './SessionPage';
-import './LoadingPage';
 import LoadingPage from './LoadingPage';
-import { v4 as uuidv4 } from 'uuid';
-import AvatarCustomiserPopUp from './AvatarCustomiserPopUp.jsx';
-import AvatarPreview from "./AvatarPreview";
+import LogInPopUp from "./LogInPopUp";
 
 function LandingPage() {
-
-    const navigate = useNavigate();
-    const [username, setUserName] = useState("");
-    const [popupMessage, setPopupMessage] = useState("Welcome!");
-    const [FadePopup, setFadePopup] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [showInput, setShowInput] = useState(true);
-    const popupRef = useRef(null);
+    const [username, setUsername] = useState(sessionStorage.getItem("username"));
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
-    const [avatarCustomiserVisible, setAvatarCustomiserVisible] = useState(false);
+    const navigate = useNavigate();
 
-    function closePopup() {
-        setFadePopup(false);
-        setPopupMessage("Welcome!");
-        setUserName("");
-        if (popupRef.current) {
-            popupRef.current.classList.remove("FadePopup");
-            popupRef.current.style.display = "none";
-        }
-    }
+    const openPopup = () => {
+        setIsPopupOpen(true);
+    };
 
-    function openPopup() {
-        setShowInput(true);
-        if (popupRef.current) {
-            popupRef.current.style.display = "initial";
-        }
-    }
-
-    function redirectToSession() {
-        setIsLoading(true);
-        setTimeout(() => {
-            navigate(`/session/${sessionStorage.getItem('sessionCode')}`);
-            setIsLoading(false);
-        }, 3000);
-    }
+    const closePopup = () => {
+        setIsPopupOpen(false);
+    };
 
     const createSession = async () => {
         try {
@@ -61,53 +32,22 @@ function LandingPage() {
                 sessionStorage.setItem("sessionCode", sessionCode);
                 redirectToSession();
             }
-
         } catch (err) {
-            console.log("Error Creating Session")
+            console.log("Error Creating Session");
         }
-    }
-
-    function redirectToJoin() {
-        navigate("/join-existing")
-    }
-
-    const handleNameChange = (event) => {
-        setUserName(event.target.value);
     };
 
-    const handleSignInClick = (event) => {
-        event.preventDefault();
-        setPopupMessage(`Hello ${username}!`);
-        setFadePopup(true);
-        setSubmitted(true);
-        setShowInput(false);
+    const redirectToJoin = () => {
+        navigate("/join-existing");
+    };
 
-        const myuuid = saveUUID();
-
-        sessionStorage.setItem("username", username);
-        sessionStorage.setItem("userID", myuuid);
-
+    const redirectToSession = () => {
+        setIsLoading(true);
         setTimeout(() => {
-            closePopup();
-        }, 1500);
+            navigate(`/session/${sessionStorage.getItem('sessionCode')}`);
+            setIsLoading(false);
+        }, 3000);
     };
-
-    function saveUUID() {
-        let myuuid = uuidv4();
-        console.log('Your UUID is: ' + myuuid);
-        sessionStorage.setItem("userID", myuuid);
-        return myuuid;
-    }
-
-    const handleAvatarClick = () => {
-        setAvatarCustomiserVisible(true);
-    };
-
-    const handleBackToLogin = () => {
-        setAvatarCustomiserVisible(false);
-    };
-
-    const avatarObject = sessionStorage.getItem("avatar")
 
     return (
         <>
@@ -125,102 +65,34 @@ function LandingPage() {
                 </div>
             </header>
 
-            {!avatarCustomiserVisible && (
-                <div className={`Login-popup ${FadePopup ? 'FadePopup' : ''}`} id="loginForm" ref={popupRef}>
-                    <form className="form-container">
-                        <h1>{popupMessage}</h1>
-
-                        {/* Avatar display */}
-                        {showInput && (
-                            <div
-                                className="Avatar-container"
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
-                                onClick={handleAvatarClick}
-                            >
-                                <div>
-                                    {avatarObject ? (
-                                        <AvatarPreview avatarObject={JSON.parse(sessionStorage.getItem("avatar"))} />
-                                    ) : (
-                                        <img
-                                            src={emptyBaseAvatar}
-                                            alt="Avatar"
-                                            className="Avatar-image"
-                                        />
-                                    )}
-                                </div>
-                                {isHovered && <div className="Avatar-tooltip">Edit Avatar</div>}
-                            </div>
-                        )}
-                        {showInput && (
-                            <>
-                                <label form="username">
-                                    <b>Please enter your username</b>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    placeholder="e.g. Pokerface100 B-)"
-                                    name="username"
-                                    value={username}
-                                    onChange={handleNameChange}
-                                    required
-                                />
-
-                                <button
-                                    type="submit"
-                                    className="Submit-username-button"
-                                    disabled={!username}
-                                    onClick={handleSignInClick}
-                                >
-                                    Submit Username
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="Close-popup-button"
-                                    onClick={closePopup}
-                                >
-                                    Close
-                                </button>
-                            </>
-                        )}
-                    </form>
-                </div>
-            )}
-
-            {avatarCustomiserVisible && (
-                <AvatarCustomiserPopUp closePopup={handleBackToLogin} />
+            {(username === null || isPopupOpen) && (
+                <LogInPopUp onClose={closePopup} />
             )}
 
             {isLoading ? (
                 <LoadingPage />
             ) : (
                 <div className="App-body">
-                    <div>
-                        <div className="Landing-buttons-container">
-                            <button
-                                className="Landing-button-component"
-                                onClick={createSession}
-                                disabled={!submitted}
-                            >
-                                <p>
-                                    Create Session
-                                </p>
-                            </button>
+                    <div className="Landing-buttons-container">
+                        <button
+                            className="Landing-button-component"
+                            onClick={createSession}
+                        >
+                            <p>
+                                Create Session
+                            </p>
+                        </button>
 
-                            <div className="Button-divider"></div>
+                        <div className="Button-divider"></div>
 
-                            <button
-                                className="Landing-button-component"
-                                onClick={redirectToJoin}
-                                disabled={!submitted}
-                            >
-                                <p>
-                                    Join Session
-                                </p>
-                            </button>
-                        </div>
+                        <button
+                            className="Landing-button-component"
+                            onClick={redirectToJoin}
+                        >
+                            <p>
+                                Join Session
+                            </p>
+                        </button>
                     </div>
 
                     <div>
@@ -229,14 +101,14 @@ function LandingPage() {
                             onClick={openPopup}
                         >
                             <p>
-                                {submitted ? "Edit Username and Avatar" : "Add Username and Avatar"}
+                                {"Edit Username and Avatar"}
                             </p>
                         </button>
                     </div>
                 </div>
             )}
         </>
-    )
+    );
 }
 
 export default LandingPage;

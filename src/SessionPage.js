@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
-import { Link, useParams } from 'react-router-dom';
+import {Client} from '@stomp/stompjs';
+import {Link, useParams} from 'react-router-dom';
 import logo from './logo.png';
 import './App.css';
 import './LogoElements.css';
 import './LandingPageElements.css';
 import './SessionPageElements.css';
 import './LandingPage.jsx';
+import LogInPopUp from "./LogInPopUp";
 
 function SessionPage() {
     const [selected, setSelected] = useState(null);
@@ -30,78 +31,20 @@ function SessionPage() {
     const [copyNotification, setCopyNotification] = useState('');
     const [votedUsers, setVotedUsers] = useState({});
     const [displayVote, setDisplayVote] = useState("?");
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const closePopup = () => {
+        setIsPopupOpen(false);
+        sendMessage()
+    };
 
     sessionStorage.setItem('sessionCode', sessionCode);
-
-    const handleRadioChange = (event) => {
-        console.log("Radio button ", event.target.value, "  clicked!");
-        setSelected(event.target.value);
-        setShowMode(false);
-        setShowMean(false);
-        setShowMedian(false);
-        setModeValue(event.target.value);
-        setMeanValue(event.target.value);
-        setMedianValue(event.target.value);
-        setEstimate(event.target.value);
-        setDisplayVote(event.target.value);
-    };
-
-    const handleResetVoting = () => {
-        setSelected(null);
-        setShowEstimates(false);
-        setResetEstimates(true);
-        setShowMode(false);
-        setShowMean(false);
-        setShowMedian(false);
-        setModeValue('');
-        setMeanValue('');
-        setMedianValue('');
-        setFadeIn(false);
-        setDisplayVote("?");
-    };
-
-    const handleResetVotingFromOthers = () => {
-        setSelected(null);
-        setShowEstimates(false);
-        setResetEstimates(false);
-        setShowMode(false);
-        setShowMean(false);
-        setShowMedian(false);
-        setModeValue('');
-        setMeanValue('');
-        setMedianValue('');
-        setFadeIn(false);
-        setEstimate('');
-        setVotedUsers({});
-        setDisplayVote("?");
-        console.log('Session has been reset by another user');
-    };
+    const userID = sessionStorage.getItem('userID');
 
     useEffect(() => {
-        if (resetEstimates) {
-            handleResetVotingFromOthers();
-            setResetEstimates(false);
+        if (userID == null || username == null) {
+            setIsPopupOpen(true);
         }
-    }, [resetEstimates]);
-
-
-    const handleRevealVotes = () => {
-        setShowEstimates(true);
-        setShowMode(true);
-        setShowMean(true);
-        setShowMedian(true);
-        setFadeIn(true);
-    };
-
-    useEffect(() => {
-        if (showEstimates) {
-            sendMessage();
-        }
-    }, [showEstimates]);
-
-    useEffect(() => {
-            sendMessage();
-    }, [resetEstimates]);
+    }, [userID, username]);
 
     useEffect(() => {
         const storedUsername = sessionStorage.getItem('username');
@@ -113,12 +56,6 @@ function SessionPage() {
             setShowWelcome(false);
         }, 1500);
     }, []);
-
-    useEffect(() => {
-        if (estimate) {
-            sendMessage();
-        }
-    }, [estimate]);
 
     useEffect(() => {
         const socket = new SockJS('https://credit-cards-f180ee269109.herokuapp.com/ws');
@@ -176,6 +113,81 @@ function SessionPage() {
             }
         };
     }, [sessionCode]);
+
+    useEffect(() => {
+        if (resetEstimates) {
+            handleResetVotingFromOthers();
+            setResetEstimates(false);
+        }
+    }, [resetEstimates]);
+
+    useEffect(() => {
+        if (showEstimates) {
+            sendMessage();
+        }
+    }, [showEstimates]);
+
+    useEffect(() => {
+        sendMessage();
+    }, [resetEstimates]);
+
+    useEffect(() => {
+        if (estimate) {
+            sendMessage();
+        }
+    }, [estimate]);
+
+    const handleRadioChange = (event) => {
+        console.log("Radio button ", event.target.value, "  clicked!");
+        setSelected(event.target.value);
+        setShowMode(false);
+        setShowMean(false);
+        setShowMedian(false);
+        setModeValue(event.target.value);
+        setMeanValue(event.target.value);
+        setMedianValue(event.target.value);
+        setEstimate(event.target.value);
+        setDisplayVote(event.target.value);
+    };
+
+    const handleResetVoting = () => {
+        setSelected(null);
+        setShowEstimates(false);
+        setResetEstimates(true);
+        setShowMode(false);
+        setShowMean(false);
+        setShowMedian(false);
+        setModeValue('');
+        setMeanValue('');
+        setMedianValue('');
+        setFadeIn(false);
+        setDisplayVote("?");
+    };
+
+    const handleResetVotingFromOthers = () => {
+        setSelected(null);
+        setShowEstimates(false);
+        setResetEstimates(false);
+        setShowMode(false);
+        setShowMean(false);
+        setShowMedian(false);
+        setModeValue('');
+        setMeanValue('');
+        setMedianValue('');
+        setFadeIn(false);
+        setEstimate('');
+        setVotedUsers({});
+        setDisplayVote("?");
+        console.log('Session has been reset by another user');
+    };
+
+    const handleRevealVotes = () => {
+        setShowEstimates(true);
+        setShowMode(true);
+        setShowMean(true);
+        setShowMedian(true);
+        setFadeIn(true);
+    };
 
     const sendMessage = () => {
         const sessionRequest = {
@@ -275,6 +287,10 @@ function SessionPage() {
                 </div>
             </header>
 
+            {isPopupOpen && (
+                <LogInPopUp onClose={closePopup} />
+            )}
+
             {showWelcome && (
                 <div className="Welcome-popup">
                     Welcome, {username}!
@@ -288,9 +304,9 @@ function SessionPage() {
                     </div>
                 )}
                 <div className="Poker-table-container">
-                        <button className="Reset-voting-button" onClick={handleResetVoting}>
-                            Reset Voting
-                        </button>
+                    <button className="Reset-voting-button" onClick={handleResetVoting}>
+                        Reset Voting
+                    </button>
                     <div className="Poker-table">
                         {!showEstimates && (
                             <button className="Reveal-submitted-votes-button" onClick={handleRevealVotes}>Reveal Votes</button>
@@ -327,14 +343,14 @@ function SessionPage() {
                             </div>
                         </div>
 
-                            <div className="Submitted-vote-card-container">
-                                <div className="Submitted-vote-card">
-                                    {displayVote}
-                                </div>
-                                <div className="Submitted-vote-card-text">
-                                    Your Vote
-                                </div>
+                        <div className="Submitted-vote-card-container">
+                            <div className="Submitted-vote-card">
+                                {displayVote}
                             </div>
+                            <div className="Submitted-vote-card-text">
+                                Your Vote
+                            </div>
+                        </div>
 
                         {users.filter(user => user.userID !== sessionStorage.getItem('userID'))
                             .map((user, index) => {
@@ -345,10 +361,10 @@ function SessionPage() {
                                 const position = positions[index % positions.length];
                                 return (
                                     <div key={user.userID} className="Submitted-vote-card-container" style={{
-                                            top: position.top,
-                                            left: position.left,
-                                            transform: position.transform,
-                                        }}>
+                                        top: position.top,
+                                        left: position.left,
+                                        transform: position.transform,
+                                    }}>
                                         <div className="Submitted-vote-card">
                                             {showEstimates ? (user.estimate ? user.estimate : "?") : "?"}
                                         </div>

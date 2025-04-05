@@ -58,7 +58,10 @@ const AvatarCustomiserPopUp = ({ closePopup }) => {
             clothing: clothingIndex >= 0 ? clothingOptions[clothingIndex] : avatarObject.clothing,
             extras: extrasIndex >= 0 ? extrasOptions[extrasIndex] : avatarObject.extras
         });
-        console.log('Updated avatarObject:', avatarObject);
+        sessionStorage.setItem("avatar", JSON.stringify(avatarObject));
+        console.log("Avatar saved into sessionStorage", avatarObject);
+        const event = new Event('avatarUpdated');
+        window.dispatchEvent(event);
     };
 
     // Call updateAvatarObject whenever any index changes
@@ -127,9 +130,6 @@ const AvatarCustomiserPopUp = ({ closePopup }) => {
                     className="Save-avatar-button"
                     onClick={() => {
                         updateAvatarObject();
-                        sessionStorage.setItem("avatar", JSON.stringify(avatarObject));
-                        console.log("Avatar saved into sessionStorage", avatarObject);
-
                         closePopup();
                     }}
                 >
