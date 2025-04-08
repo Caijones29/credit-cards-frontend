@@ -18,7 +18,8 @@
 
 .Header {
   background-color: #FAF9F6;
-  min-height: 10vh;
+  min-height: 10%;
+  width: 90%;
   font-size: calc(50px + 2vmin);
   font-weight: bold;
   font-family: "Ford Antenna", sans-serif;

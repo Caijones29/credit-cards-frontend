@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from './logo.png';
 import './App.css';
@@ -7,11 +7,11 @@ import './LogoElements.css';
 import './LandingPageElements.css';
 import './SessionPageElements.css';
 import LoadingPage from './LoadingPage';
-import LogInPopUp from "./LogInPopUp";
+import LogInPopUp from './LogInPopUp';
 
 function LandingPage() {
     const [username, setUsername] = useState(sessionStorage.getItem("username"));
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(!username); // Open popup if no username
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -25,7 +25,16 @@ function LandingPage() {
 
     const createSession = async () => {
         try {
-            const response = await axios.post('https://credit-cards-f180ee269109.herokuapp.com/session/createNewSession');
+            const response = await axios.post(
+                'https://credit-cards-f180ee269109.herokuapp.com/session/createNewSession',
+                {}, // No data payload
+                {
+                    headers: {
+                        'isPrivateSession': sessionStorage.getItem("sessionType") || 'false', // Default to false
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
             const sessionCode = response.data.sessionCode;
 
             if (sessionCode != null) {
@@ -33,7 +42,7 @@ function LandingPage() {
                 redirectToSession();
             }
         } catch (err) {
-            console.log("Error Creating Session");
+            console.log("Error Creating Session:", err);
         }
     };
 
@@ -47,6 +56,14 @@ function LandingPage() {
             navigate(`/session/${sessionStorage.getItem('sessionCode')}`);
             setIsLoading(false);
         }, 3000);
+    };
+
+    const handleCreateSessionClick = () => {
+        if (username) {
+            createSession();
+        } else {
+            openPopup();
+        }
     };
 
     return (
@@ -65,7 +82,7 @@ function LandingPage() {
                 </div>
             </header>
 
-            {(username === null || isPopupOpen) && (
+            {isPopupOpen && (
                 <LogInPopUp onClose={closePopup} />
             )}
 
@@ -76,7 +93,7 @@ function LandingPage() {
                     <div className="Landing-buttons-container">
                         <button
                             className="Landing-button-component"
-                            onClick={createSession}
+                            onClick={handleCreateSessionClick}
                         >
                             <p>
                                 Create Session

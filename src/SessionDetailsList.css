@@ -1,0 +1,66 @@
+.session-container {
+    padding: 10px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 1px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.session-title {
+    text-align: center;
+    color: #333;
+}
+
+.session-button-list {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.session-button {
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #365da7;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.session-button:hover {
+    background-color: white;
+    color: midnightblue;
+    font-weight: bold;
+    border: 3px solid #365da7;
+}
+
+.session-button h2 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.session-button p {
+    margin: 5px 0 0;
+}
+
+.participant-info {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.participant-image {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #365da7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+

@@ -1,19 +1,15 @@
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from 'react-router-dom';
 import logo from './logo.png';
 import './App.css';
-import './LogoElements.css'
-import './LandingPageElements.css'
-import './SessionPageElements.css'
-import './JoinPageElements.css'
-import './SessionPage'
-import './LoadingPage';
+import './LogoElements.css';
+import './LandingPageElements.css';
+import './SessionPageElements.css';
+import './JoinPageElements.css';
 import LoadingPage from "./LoadingPage";
-import {Link, useNavigate} from 'react-router-dom';
-import React, {useState} from "react";
-import {useEffect} from "react";
-
+import SessionDetailsList from "./ShowSessionList";
 
 function JoinPage() {
-
     const navigate = useNavigate();
     const [sessionCode, setSessionCode] = useState("");
     const [username, setUsername] = useState('');
@@ -38,6 +34,10 @@ function JoinPage() {
 
     const handleSessionCodeChange = (event) => {
         setSessionCode(event.target.value);
+    };
+
+    const handleSessionSelect = (code) => {
+        setSessionCode(code);
     };
 
     useEffect(() => {
@@ -66,26 +66,42 @@ function JoinPage() {
             {isLoading ? (
                 <LoadingPage />
             ) : (
+                <div className="App-body">
+                    <form className="form-container" onSubmit={redirectToSession}>
+                        <h1>Hello {username}!</h1>
 
-            <div className="App-body">
-                <form className="form-container" onSubmit={redirectToSession}>
-                    <h1>Hello {username}!</h1>
+                        <div className="join-session-wrapper">
 
-                    <label form="sessionCode">
-                        <b>Please enter the Session Code</b>
-                    </label>
+                            <div className="session-list">
+                                <p>Select a session</p>
+                                <SessionDetailsList onSelectSession={handleSessionSelect} />
+                            </div>
 
-                    <input type="text" placeholder="e.g. v0t1N" name="sessionCode" value={sessionCode} onChange={handleSessionCodeChange} required/>
+                            <div className="manual-join">
+                                <label htmlFor="sessionCode">
+                                    <b>Please enter the Session Code</b>
+                                </label>
 
-                    <button type="submit" className="Join-session-button" disabled={!sessionCode}>
-                        Join Session
-                    </button>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. v0t1N"
+                                    name="sessionCode"
+                                    value={sessionCode}
+                                    onChange={handleSessionCodeChange}
+                                    required
+                                />
 
-                    <button type="button" className="Go-back-button" onClick={redirectToLanding}>
-                        Back
-                    </button>
-                </form>
-            </div>
+                                <button type="submit" className="Join-session-button" disabled={!sessionCode}>
+                                    Join Session
+                                </button>
+
+                                <button type="button" className="Go-back-button" onClick={redirectToLanding}>
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             )}
         </>
     );

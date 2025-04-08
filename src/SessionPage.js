@@ -1,14 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
-import {Client} from '@stomp/stompjs';
-import {Link, useParams} from 'react-router-dom';
+import { Client } from '@stomp/stompjs';
+import { Link, useParams } from 'react-router-dom';
 import logo from './logo.png';
+import closedPadlock from './CC Closed Padlock Blank.PNG';
+import openPadlock from './CC Open Padlock Blank Light.PNG';
 import './App.css';
 import './LogoElements.css';
 import './LandingPageElements.css';
 import './SessionPageElements.css';
-import './LandingPage.jsx';
 import LogInPopUp from "./LogInPopUp";
+import AvatarPreview from "./AvatarPreview";
 
 function SessionPage() {
     const [selected, setSelected] = useState(null);
@@ -24,7 +26,8 @@ function SessionPage() {
     const [resetEstimates, setResetEstimates] = useState(false);
     const [fadeIn, setFadeIn] = useState(false);
     const [estimate, setEstimate] = useState("");
-    const [privateSession, setPrivateSession] = useState(true);
+    const [isLocked, setIsLocked] = useState(false);
+    const [lockNotification, setLockNotification] = useState('');
     const [users, setUsers] = useState([]);
     const stompClientRef = useRef(null);
     const { sessionCode } = useParams();
@@ -32,9 +35,10 @@ function SessionPage() {
     const [votedUsers, setVotedUsers] = useState({});
     const [displayVote, setDisplayVote] = useState("?");
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+
     const closePopup = () => {
         setIsPopupOpen(false);
-        sendMessage()
+        sendMessage();
     };
 
     sessionStorage.setItem('sessionCode', sessionCode);
@@ -58,12 +62,6 @@ function SessionPage() {
     }, []);
 
     useEffect(() => {
-        if (estimate) {
-            sendMessage();
-        }
-    }, [estimate]);
-
-    useEffect(() => {
         const socket = new SockJS('https://credit-cards-f180ee269109.herokuapp.com/ws');
         const stompClient = new Client({
             webSocketFactory: () => socket,
@@ -80,7 +78,6 @@ function SessionPage() {
 
                         if (receivedData.participants) {
                             console.log("Participants data:", receivedData.participants);
-
                             setUsers(receivedData.participants);
 
                             const updatedVotedUsers = {};
@@ -92,25 +89,23 @@ function SessionPage() {
                             setVotedUsers(updatedVotedUsers);
                         }
 
-                        if(receivedData.showEstimates === true) {
+                        if (receivedData.showEstimates === true) {
                             setShowEstimates(receivedData.showEstimates);
-                            handleRevealVotes()
+                            handleRevealVotes();
                         }
                         if (receivedData.resetEstimates === true) {
                             handleResetVotingFromOthers();
                         }
 
-                        console.log(receivedData.sessionAverages)
                         setMeanValue(receivedData.sessionAverages.mean);
                         setModeValue(receivedData.sessionAverages.mode);
                         setMedianValue(receivedData.sessionAverages.median);
-
 
                     } catch (error) {
                         console.error('Error parsing message body as JSON:', error);
                     }
                 });
-                sendMessage()
+                sendMessage();
             },
         });
 
@@ -134,30 +129,14 @@ function SessionPage() {
     }, [resetEstimates]);
 
     useEffect(() => {
-        if (showEstimates) {
+        if (showEstimates || estimate || resetEstimates) {
             sendMessage();
         }
-    }, [showEstimates]);
-
-    useEffect(() => {
-        sendMessage();
-    }, [resetEstimates]);
-
-    useEffect(() => {
-        if (estimate) {
-            sendMessage();
-        }
-    }, [estimate]);
+    }, [showEstimates, estimate, resetEstimates]);
 
     const handleRadioChange = (event) => {
         console.log("Radio button ", event.target.value, "  clicked!");
         setSelected(event.target.value);
-        setShowMode(false);
-        setShowMean(false);
-        setShowMedian(false);
-        setModeValue(event.target.value);
-        setMeanValue(event.target.value);
-        setMedianValue(event.target.value);
         setEstimate(event.target.value);
         setDisplayVote(event.target.value);
     };
@@ -206,17 +185,18 @@ function SessionPage() {
             showEstimates: showEstimates,
             resetEstimates: resetEstimates,
             sessionCode: sessionCode,
-            privateSession: privateSession,
+            privateSession: isLocked,
             participant: {
                 userName: sessionStorage.getItem('username'),
                 userID: sessionStorage.getItem('userID'),
-                estimate: estimate
+                estimate: estimate,
+                avatar: sessionStorage.getItem("avatar")
             }
         };
 
         if (stompClientRef.current && stompClientRef.current.connected) {
             stompClientRef.current.publish({
-                destination: '/app/session/info/{sessionCode}',
+                destination: `/app/session/info/${sessionCode}`,
                 body: JSON.stringify(sessionRequest),
                 headers: {
                     'sessionCode': sessionRequest.sessionCode,
@@ -253,6 +233,20 @@ function SessionPage() {
         }
     };
 
+    const toggleLock = () => {
+        const newLockState = !isLocked;
+        setIsLocked(newLockState);
+
+        const lockStatusMessage = newLockState ? 'Session is now Private' : 'Session is now Public';
+        setLockNotification(lockStatusMessage);
+
+        setTimeout(() => {
+            setLockNotification('');
+        }, 2000);
+
+        sendMessage();
+    };
+
     const dynamicPositions = (userCount) => {
         const positions = [];
         const radiusX = 52;
@@ -284,117 +278,111 @@ function SessionPage() {
                 <img src={logo} className="Logo-spin-flat" alt="Logo" />
                 <div className="Header-wrapper">
                     <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <h1 className="Header-text">
-                            Credit Cards
-                        </h1>
+                        <h1 className="Header-text">Credit Cards</h1>
                     </Link>
-                    <span className="Header-subtext">
-                        Planning Poker
-                    </span>
+                    <span className="Header-subtext">Planning Poker</span>
                 </div>
 
                 <div className="Session-code-display">
                     <span className="Session-code-label">Session Code:</span>
                     <span className="Session-code-value" onClick={handleCopySessionCode} title="Click to Copy">{sessionCode}</span>
                 </div>
+
+                <div className="Padlock-icon-container">
+                    <img
+                        src={isLocked ? closedPadlock : openPadlock}
+                        alt="Padlock"
+                        className={`Padlock-icon ${isLocked ? 'Closed-padlock' : 'Open-padlock'}`}
+                        onClick={toggleLock}
+                    />
+                </div>
             </header>
 
-            {isPopupOpen && (
-                <LogInPopUp onClose={closePopup} />
-            )}
+            {isPopupOpen && <LogInPopUp onClose={closePopup} />}
 
-            {showWelcome && (
-                <div className="Welcome-popup">
-                    Welcome, {username}!
-                </div>
-            )}
+            {showWelcome && <div className="Welcome-popup">Welcome, {username}!</div>}
 
             <div className="App-body">
-                {copyNotification && (
-                    <div className="Copy-notification">
-                        {copyNotification}
-                    </div>
-                )}
+                {copyNotification && <div className="Copy-notification">{copyNotification}</div>}
+                {lockNotification && <div className="Lock-notification">{lockNotification}</div>}
+
                 <div className="Poker-table-container">
-                    <button className="Reset-voting-button" onClick={handleResetVoting}>
-                        Reset Voting
-                    </button>
+                    <button className="Reset-voting-button" onClick={handleResetVoting}>Reset Voting</button>
                     <div className="Poker-table">
                         {!showEstimates && (
-                            <button className="Reveal-submitted-votes-button" onClick={handleRevealVotes}>Reveal Votes</button>
+                            <button className="Reveal-submitted-votes-button" onClick={handleRevealVotes}>
+                                Reveal Votes
+                            </button>
                         )}
+
                         <div className={`Vote-average-container ${fadeIn ? 'fade-in' : ''}`}>
                             <div className="Mean-vote-average-container" style={{ display: showMean ? 'flex' : 'none' }}>
-                                <div className="Mean-vote-average">
-                                    {meanValue}
-                                </div>
-
-                                <div className="Mean-vote-average-text">
-                                    Vote Average
-                                </div>
+                                <div className="Mean-vote-average">{meanValue}</div>
+                                <div className="Mean-vote-average-text">Vote Average</div>
                             </div>
 
                             <div className="Mode-vote-average-container" style={{ display: showMode ? 'flex' : 'none' }}>
-                                <div className="Mode-vote-average">
-                                    {modeValue}
-                                </div>
-
-                                <div className="Mode-vote-average-text">
-                                    Most Common Vote
-                                </div>
+                                <div className="Mode-vote-average">{modeValue}</div>
+                                <div className="Mode-vote-average-text">Most Common Vote</div>
                             </div>
 
                             <div className="Median-vote-average-container" style={{ display: showMedian ? 'flex' : 'none' }}>
-                                <div className="Median-vote-average">
-                                    {medianValue}
-                                </div>
-
-                                <div className="Median-vote-average-text">
-                                    Meet in the Middle?
-                                </div>
+                                <div className="Median-vote-average">{medianValue}</div>
+                                <div className="Median-vote-average-text">Meet in the Middle?</div>
                             </div>
                         </div>
 
                         <div className="Submitted-vote-card-container">
-                            <div className="Submitted-vote-card">
-                                {displayVote}
-                            </div>
-                            <div className="Submitted-vote-card-text">
-                                Your Vote
-                            </div>
+                            <div className="Submitted-vote-card">{displayVote}</div>
+                            <div className="Submitted-vote-card-text">Your Vote</div>
                         </div>
 
-                        {users.filter(user => user.userID !== sessionStorage.getItem('userID'))
-                            .map((user, index) => {
-                                const positions = dynamicPositions(users.length - 1);
-                                if (!positions || positions.length === 0 || index >= positions.length) {
-                                    return null;
-                                }
-                                const position = positions[index % positions.length];
-                                return (
-                                    <div key={user.userID} className="Submitted-vote-card-container" style={{
+                        {users.filter(user => user.userID !== sessionStorage.getItem('userID')).map((user, index) => {
+                            const positions = dynamicPositions(users.length - 1);
+                            if (!positions || positions.length === 0 || index >= positions.length) return null;
+
+                            const position = positions[index % positions.length];
+                            let avatarObject;
+                            try {
+                                avatarObject = JSON.parse(user.avatar);
+                            } catch (e) {
+                                console.error('Error parsing avatar JSON:', e);
+                                avatarObject = {};
+                            }
+
+                            return (
+                                <div
+                                    key={user.userID}
+                                    className="Submitted-vote-card-container"
+                                    style={{
                                         top: position.top,
                                         left: position.left,
                                         transform: position.transform,
-                                    }}>
-                                        <div className="Submitted-vote-card">
-                                            {showEstimates ? (user.estimate ? user.estimate : "?") : "?"}
-                                        </div>
-                                        <div className="Submitted-vote-card-text">
-                                            {user.userName}
-                                        </div>
+                                    }}
+                                >
+                                    <div className="session-avatar-wrapper">
+                                        <AvatarPreview avatarObject={avatarObject} />
                                     </div>
-                                );
-                            })}
+                                    <div className="Submitted-vote-card">{showEstimates ? (user.estimate || "?") : "?"}</div>
+                                    <div className="Submitted-vote-card-text">{user.userName}</div>
+                                </div>
+                            );
 
+                        })}
                     </div>
                 </div>
 
                 <div className="Voting-button-container">
                     {["1", "2", "3", "5", "8", "13", "?"].map((value) => (
-                        <label key={value} className={`Voting-button ${selected === value ? "checked" : ""}`} >
+                        <label key={value} className={`Voting-button ${selected === value ? "checked" : ""}`}>
                             {value}
-                            <input type="radio" name="radio" value={value} checked={selected === value} onChange={handleRadioChange}/>
+                            <input
+                                type="radio"
+                                name="radio"
+                                value={value}
+                                checked={selected === value}
+                                onChange={handleRadioChange}
+                            />
                         </label>
                     ))}
                 </div>
