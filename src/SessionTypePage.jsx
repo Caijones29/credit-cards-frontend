@@ -19,7 +19,7 @@ function SessionTypePage() {
         setIsLoading(true);
         try {
             const response = await axios.post(
-                'http://localhost:8080/session/createNewSession',
+                'https://credit-cards-f180ee269109.herokuapp.com/session/createNewSession',
                 {},
                 {
                     headers: {

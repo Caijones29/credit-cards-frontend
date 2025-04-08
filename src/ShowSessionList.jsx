@@ -8,7 +8,7 @@ const SessionDetailsList = ({ onSelectSession }) => {
     useEffect(() => {
         const fetchSessionDetails = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/session/getPublic');
+                const response = await axios.get('https://credit-cards-f180ee269109.herokuapp.com/session/getPublic');
                 setSessionDetails(response.data);
             } catch (error) {
                 console.error('Error fetching session details:', error);
