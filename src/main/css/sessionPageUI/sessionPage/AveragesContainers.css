@@ -1,0 +1,42 @@
+.Vote-average-container {
+    width: 75%;
+    height: auto;
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 3s ease-in-out;
+}
+
+.Vote-average-container.fade-in {
+    opacity: 1;
+}
+
+.Mode-vote-average-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    height: auto;
+}
+
+.Mean-vote-average-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    height: auto;
+}
+
+.Median-vote-average-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    height: auto;
+}

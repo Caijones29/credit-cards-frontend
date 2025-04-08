@@ -1,0 +1,80 @@
+.Poker-table-container {
+    display: grid;
+    place-items: center;
+    flex-grow: 1;
+}
+
+.Poker-table {
+    height: 55%;
+    width: 50%;
+    background-color: lightgrey;
+    border-radius: 50%;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+
+.Submitted-vote-card-container {
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 115%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.session-avatar-wrapper {
+    width: 10px;
+    height: 10px;
+    margin-right: 80px;
+    margin-left: 20px;
+    margin-top: 1px;
+    margin-bottom: 200px;
+}
+
+.session-avatar-wrapper img {
+    margin-top: 15px;
+    margin-right: 100px;
+    width: 65%;
+    height: 65%;
+}
+
+.Submitted-vote-card {
+    background-color: midnightblue;
+    color: white;
+    border: none;
+    width: 45px;
+    height: 65px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 30px;
+    font-family: "Ford Antenna", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: none;
+    z-index: 1;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
+    margin-right: 1px;
+    margin-left: 65px;
+}
+
+.Submitted-vote-card-text {
+    font-size: 15px;
+    color: midnightblue;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+    margin-top: 15px;
+    background: none;
+    z-index: 1;
+}
+
+
+
+

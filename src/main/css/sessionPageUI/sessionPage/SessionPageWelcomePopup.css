@@ -1,0 +1,22 @@
+.Welcome-popup {
+    position: fixed;
+    top: 43%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 50px;
+    font-weight: bold;
+    color: white;
+    background-color: rgba(54, 93, 167, 0.7);
+    padding: 2%;
+    border-radius: 35px;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+    text-shadow: 0 0 40px rgba(0, 0, 0, 0.75);
+    transition: opacity 3s ease-in-out;
+    opacity: 1
+}
+
+.FadePopup {
+    opacity: 0;
+}

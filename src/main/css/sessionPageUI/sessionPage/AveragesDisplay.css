@@ -1,0 +1,50 @@
+.Mode-vote-average {
+    font-size: 110px;
+    font-weight: bold;
+    color: white;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+    text-shadow: 20px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.Mean-vote-average {
+    font-size: 80px;
+    font-weight: bold;
+    color: white;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+    text-shadow: 20px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.Median-vote-average {
+    font-size: 80px;
+    font-weight: bold;
+    color: white;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+    text-shadow: 20px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.Mode-vote-average-text {
+    font-size: 28px;
+    color: midnightblue;
+    font-family: "Ford Antenna", sans-serif;
+    font-weight: bold;
+    text-align: center;
+}
+
+.Mean-vote-average-text {
+    font-size: 20px;
+    color: #365da7;
+    font-weight: bold;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+}
+
+.Median-vote-average-text {
+    font-size: 20px;
+    color: #365da7;
+    font-weight: bold;
+    font-family: "Ford Antenna", sans-serif;
+    text-align: center;
+}

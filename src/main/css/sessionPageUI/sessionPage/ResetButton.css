@@ -1,0 +1,25 @@
+.Reset-voting-button {
+    background-color: #365da7;
+    border: none;
+    border-radius: 80px;
+    color: white;
+    text-align: center;
+    padding: 1% 0;
+    text-decoration: none;
+    display: grid;
+    font-size: 24px;
+    font-family: "Ford Antenna", sans-serif;
+    transition-duration: 0.3s;
+    width: 250px;
+    position: fixed;
+    top: 20vh;
+    right: 5vh;
+    z-index: 1;
+}
+
+.Reset-voting-button:hover {
+    background-color: white;
+    color: midnightblue;
+    font-weight: bold;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}

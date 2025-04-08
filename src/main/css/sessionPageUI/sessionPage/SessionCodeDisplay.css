@@ -1,0 +1,45 @@
+.Session-code-display {
+    color: #365da7;
+    font-family: "Ford Antenna", sans-serif;
+    font-size: 20px;
+    position: absolute;
+    right: 7.5%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Session-code-label {
+    margin-right: 5px;
+    font-weight: lighter;
+    text-align: center;
+}
+
+.Session-code-value {
+    color: midnightblue;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.Session-code-value:hover {
+    color: white;
+    text-shadow: 0 0 30px rgba(0, 0, 0, 0.75);
+}
+
+.Copy-notification {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(54, 93, 167, 0.7);
+    color: white;
+    font-family: "Ford Antenna", sans-serif;
+    font-size: large;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 35px;
+    z-index: 10;
+}

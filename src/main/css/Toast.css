@@ -1,0 +1,18 @@
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: -300px; /* Start off-screen */
+    background-color: red;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: right 0.3s ease-out, opacity 0.3s ease-out;
+    opacity: 0;
+}
+
+.toast-container.visible {
+    right: 20px; /* Move it into view */
+    opacity: 1;
+}

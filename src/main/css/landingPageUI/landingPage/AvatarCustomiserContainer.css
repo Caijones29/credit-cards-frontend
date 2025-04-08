@@ -1,0 +1,45 @@
+.Avatar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 1rem;
+    margin-right: 40px;
+}
+
+.Avatar-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 0;
+    object-fit: cover;
+    transition: transform 0.2s ease-in-out;
+    margin-left: 50px;
+}
+
+.Avatar-image:hover {
+    transform: scale(1.15);
+}
+
+.Avatar-tooltip {
+    position: absolute;
+    top: 60%;
+    left: 47%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(54, 93, 167, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: "Ford Antenna", sans-serif;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    margin-left: 30px;
+}
+
+.Avatar-container:hover .Avatar-tooltip {
+    opacity: 1;
+    visibility: visible;
+    z-index: 4;
+}
