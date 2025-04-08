@@ -74,7 +74,7 @@ function SessionPage() {
     }, []);
 
     useEffect(() => {
-        const socket = new SockJS('https://credit-cards-f180ee269109.herokuapp.com/ws');
+        const socket = new SockJS(`${process.env.REACT_APP_BACKEND_URL}/ws`);
         const stompClient = new Client({
             webSocketFactory: () => socket,
             debug: function (str) {

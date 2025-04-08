@@ -25,11 +25,11 @@ function SessionTypePage() {
     const createSession = async () => {
         try {
             const response = await axios.post(
-                'https://credit-cards-f180ee269109.herokuapp.com/session/createNewSession',
-                {}, // No data payload
+                `${process.env.REACT_APP_BACKEND_URL}/session/createNewSession`,
+                {},
                 {
                     headers: {
-                        'isPrivateSession': sessionStorage.getItem("sessionType") || 'false', // Default to false
+                        'isPrivateSession': sessionStorage.getItem("sessionType") || 'false',
                         'Content-Type': 'application/json'
                     }
                 }

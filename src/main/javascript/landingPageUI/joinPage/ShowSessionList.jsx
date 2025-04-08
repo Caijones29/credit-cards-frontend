@@ -10,7 +10,8 @@ const SessionDetailsList = ({ onSelectSession }) => {
     useEffect(() => {
         const fetchSessionDetails = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/session/getPublic');
+                const response = await axios.get(
+                    `${process.env.REACT_APP_BACKEND_URL}/session/getPublic`)
                 setSessionDetails(response.data);
             } catch (error) {
                 navigate("/error")
